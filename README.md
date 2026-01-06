@@ -56,11 +56,3 @@ NarrGraph was trained to extract the following entities and link strctures wihtc
 For reproducibility, the LUSA dataset used in the paper was attached to the paper submission. The dataset is also openly available at [https://rdm.inesctec.pt/dataset/cs-2023-018](https://rdm.inesctec.pt/dataset/cs-2023-018).
 
 
----
-
-## License & Ethics
-
-* For **research and educational purposes only**.
-* Do not apply to **private, sensitive, or confidential documents**.
-* Ensure responsible use, especially when working with news or personal data.
-
