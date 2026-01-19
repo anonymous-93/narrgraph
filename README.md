@@ -21,7 +21,7 @@ The model architecture consists of three main components:
 2.  In the red box, the resulting node embeddings are used to predict token-level entity labels. 
 3. In the blue box, the model predicts the edges by representing candidate relations through the concatenation of embeddings of token pairs `(i,j)`, augmented with the predicted entity information. 
 
-
+---
 
 ## Annotation Framework
 NarrGraph was trained to extract the following entities and link strctures wihtch correspond to the nodes and edges of the extracted graph :
@@ -47,6 +47,39 @@ NarrGraph was trained to extract the following entities and link strctures wihtc
 - **Qualitative Spatial Links (QSLINK):** Qualitative spatial relations linking a Figure (the entity being located) to a Ground (the reference location). These links connect events to Spatial\_Relations or Spatial\_Relations to participants. 
 
 - **Objectal Links (OLINKs):** Referential or coreferential relations between entities. These links connect Participants to Participants, Spatial\_Relations to Spatial\_Relations, or across these entity types.
+
+---
+
+
+## Getting Started
+
+Follow these steps to set up and run NarrGraph locally:
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/anonymous-93/narrgraph
+cd narrgraph
+```
+
+### 2. Create a Python virtual environment
+
+```bash
+python3 -m venv venv
+```
+
+### 3. Install dependencies
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### 4. Run the main script
+
+```bash
+python src/main.py
+```
 
 ---
 
