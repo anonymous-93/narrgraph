@@ -38,11 +38,11 @@ def set_all_seeds(seed=42):
 
 
 
-class SGEN(nn.Module):
+class NarrGraph(nn.Module):
     def __init__(self, input_dim, hidden_dim, config, dep_size, relation_type_mapping, iob_labels):
-        super(SGEN, self).__init__()
+        super(NarrGraph, self).__init__()
         decoder_size = 512
-  
+        dep_size = dep_size + 3 #seq, full
         self.num_entity_labels = len(iob_labels)
         num_relation_labels = len(relation_type_mapping)
 
@@ -147,9 +147,12 @@ class SGEN(nn.Module):
 
     def forward(self, data, pipeline=False):
         data = data.to(device)
+        #print(data)
         x , edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
         x = self.preprocess_bert(data)
+        #print(x.shape)
         z = self.encode(x, edge_index, edge_attr) #mu, logstd
+        #print(z.shape)
         sequence_output = self.dropout(z)
         entity_logits_init = self.entity_classifier(sequence_output)
 

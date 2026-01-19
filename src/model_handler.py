@@ -2,9 +2,9 @@ from transformers import BertModel, AutoConfig
 import torch
 import torch.nn as nn
 import train
-import sgen_model
+import narrgraph
 
-def train_model(train_loader, val_loader, test_loader, universal_pos_tags, iob_labels, iob2id, id2iob, relation_type_mapping, depsize):
+def train_model(train_loader, val_loader, test_loader, universal_pos_tags, iob_labels, iob2id, id2iob, relation_type_mapping, depsize, output_model_path="./models/narrgraph.pt"):
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -21,7 +21,7 @@ def train_model(train_loader, val_loader, test_loader, universal_pos_tags, iob_l
         config=config,
         add_pooling_layer=True  # Required to match pretrained checkpoint
     )
-    model = sgen_model.SGEN(input_dim, hidden_dim, config, dep_size= depsize,
+    model = narrgraph.NarrGraph(input_dim, hidden_dim, config, dep_size= depsize,
                             relation_type_mapping=relation_type_mapping,
                             iob_labels= iob_labels
                         )
@@ -39,21 +39,21 @@ def train_model(train_loader, val_loader, test_loader, universal_pos_tags, iob_l
     label_loss_fn = nn.BCEWithLogitsLoss()
     entity_loss_fn = nn.CrossEntropyLoss()
 
-    model_save_path = "./models/__.pt"
+    model_save_path = output_model_path 
     best_val_f1 = 0.0
     patience = 20   # stop if no improvement for 30 epochs
     counter = 0
 
     for epoch in range(1000):
         # Training step
-        loss = train.train(model, train_loader, label_loss_fn, entity_loss_fn, optimizer, scheduler=None)
+        loss = train.train(model, train_loader, label_loss_fn, entity_loss_fn, optimizer, iob_labels, device, scheduler=None)
         
         if epoch % 1 == 0:
             print(f"=================== EPOCH {epoch} ==================")
             print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
             
             # Evaluate on validation set
-            val_entity_f1, val_edge_f1 = train.evaluate(model, val_loader, device)
+            val_entity_f1, val_edge_f1 = train.evaluate(model, val_loader, device, id2iob, relation_type_mapping)
             #print(f"Validation Edge F1: {val_edge_f1:.4f}, Entity F1: {val_entity_f1:.4f}")
 
             # Early stopping / best model saving

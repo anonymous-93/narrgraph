@@ -2,7 +2,7 @@ import spacy
 import torch
 import os 
 import re
-from brat_parser import parse_brat
+from parse_brat import parse_brat
 
 
 
@@ -46,17 +46,17 @@ def get_spacy_token_indices(span, doc, idx):
                 token_indices.append(token.i)
             elif token.idx <= start  <= token.idx + len(token.text) and token.idx + len(token.text) <= end:
                 token_indices.append(token.i)
-        if token_indices == []:
+        #if token_indices == []:
             
-            print("Error when mapping spacy tokens to entities spans")
-            print(span)
-            print(doc.text[start:end])
-            print(doc.text[start- 10:end+10])
-            print(doc)
-            print("Entity ID:", idx)
-            for token in doc:
-                print(token.idx, len(token.text))
-                print(token.text)
+            #print("Error when mapping spacy tokens to entities spans")
+            #print(span)
+            #print(doc.text[start:end])
+            #print(doc.text[start- 10:end+10])
+            #print(doc)
+            #print("Entity ID:", idx)
+            #for token in doc:
+                #print(token.idx, len(token.text))
+                #print(token.text)
         #if idx == "T56":
         #    print("T56", span, start, end, token_indices)
         ##    print("T56", token_indices)
@@ -207,9 +207,9 @@ def generateTargetEdgeIndex(relations, node_id_mapping, relation_type_mapping):
         if rel.subj in node_id_mapping and rel.obj in node_id_mapping:
             subj_idx = node_id_mapping[rel.subj]
             obj_idx = node_id_mapping[rel.obj]
-            if subj_idx == obj_idx:
-                print("ERROR: Self-loop detected")
-                print(rel)
+            #if subj_idx == obj_idx:
+                #print("ERROR: Self-loop detected")
+                #print(rel)
             edge_key = tuple(sorted([subj_idx, obj_idx]))
             #one_hot_attr = torch.tensor(one_hot_encode(relation_type_mapping[rel.type.split("_")[0]],len(relation_type_mapping))).clone().detach()
             one_hot_attr = torch.as_tensor(one_hot_encode(relation_type_mapping[rel.type.split("_")[0]], len(relation_type_mapping))).clone().detach() #rel.type.split("_")[0]
@@ -339,16 +339,16 @@ def generateDataset(entities, relations, text, relation_type_mapping, input_rel_
 def generateDatasets(files, relation_type_mapping, nlp):
     data_list = []
     entities_list, relations_list, texts_list = parse_brat(files)
-    print(len(entities_list), len(relations_list), len(texts_list))
+    #print(len(entities_list), len(relations_list), len(texts_list))
     
     #relation_types = ['TLINK', 'SRLINK', 'QSLINK'] #list(set(rel.type.split("_")[0] for relations in relations_list for rel in relations.values()))
     #print(relation_types)
     
-    print(relation_type_mapping)
+    #print(relation_type_mapping)
     input_rel_label2id = {label: idx for idx, label in enumerate(list(nlp.get_pipe("parser").labels) + ["seq", "full", "entity"])}
     #print(len(relation_type_mapping), len(dep_label_mapping))
     for i, entities in enumerate(entities_list):
-        print(files[i])
+        #print(files[i])
         #if relations_list[i] == {}:
             #print(texts_list[i])
             #print(i)
@@ -360,13 +360,13 @@ def generateDatasets(files, relation_type_mapping, nlp):
         #loader = DataLoader(data_list, batch_size=32)
     return data_list
 
-
+\
 from torch_geometric.loader import DataLoader
 
-def generateDataLoaders(files_train, files_val, files_test, batch_size=1):
-    data_list_train = generateDatasets(files_train)
-    data_list_test = generateDatasets(files_test)
-    data_list_val = generateDatasets(files_val)
+def generateDataLoaders(files_train, files_val, files_test,relation_type_mapping,nlp, batch_size=1):
+    data_list_train = generateDatasets(files_train, relation_type_mapping, nlp)
+    data_list_test = generateDatasets(files_test, relation_type_mapping, nlp)
+    data_list_val = generateDatasets(files_val, relation_type_mapping, nlp)
     entity_preds = get_entity_preds("lusa_ner_predictions_test.json")
     
     for data, preds in zip(data_list_test, entity_preds):

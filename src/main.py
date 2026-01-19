@@ -59,9 +59,10 @@ relation_type_mapping = {'TLINK': 0, 'SRLINK': 1, 'QSLINK': 2, "OLINK": 3}
 
 
 if __name__ == "__main__":
-    path = "./data"
+    path = "../data"
+    print("Loading spacy model...")
     nlp = spacy.load('pt_core_news_lg')
-    
+    print("Loaded spacy model")
     depsize = len(nlp.get_pipe("parser").labels)
     
     files_train = []
@@ -77,9 +78,15 @@ if __name__ == "__main__":
                 files_val.append(os.path.join(path, file[1]))
             else:
                 files_train.append(os.path.join(path, file[1]))
-                
+    print(f"Number of training files: {len(files_train)}")
+    print(f"Number of validation files: {len(files_val)}")
+    print(f"Number of test files: {len(files_test)}")
+    
+    print("Generating data loaders")  
     train_loader, test_loader, val_loader = preprocess_data.generateDataLoaders(files_train, files_val, files_test, relation_type_mapping, nlp)
-    model_handler.train_model(train_loader, val_loader, test_loader, universal_pos_tags, iob_labels, iob2id, id2iob, relation_type_mapping, depsize)
+    
+    print(f"Starting training...")
+    model_handler.train_model(train_loader, val_loader, test_loader, universal_pos_tags, iob_labels, iob2id, id2iob, relation_type_mapping, depsize, output_model_path="./models/narrgraph.pt")
 
     
     
